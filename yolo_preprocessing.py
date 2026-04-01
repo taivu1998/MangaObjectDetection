@@ -1,21 +1,22 @@
-# from google.colab import drive
-# drive.mount('/content/drive',force_remount=True)
+import argparse
+from pathlib import Path
 
-# cd 'drive/MyDrive/CS 231N Project/'
+from manga_detection.data.constants import DEFAULT_DATASET_ROOT, DEFAULT_YOLO_ROOT
+from manga_detection.data.yolo_export import copy_images
 
-import os
 
-# First, copy all the images to the correct folder and rename them
-manga_dirs = os.listdir('Manga109/images/')
-manga_dirs.sort()
+def build_parser():
+    parser = argparse.ArgumentParser(description="Copy Manga109 images into the YOLO custom images directory.")
+    parser.add_argument("--dataset-root", type=Path, default=DEFAULT_DATASET_ROOT)
+    parser.add_argument("--output-images-dir", type=Path, default=DEFAULT_YOLO_ROOT / "images")
+    return parser
 
-for manga_dir in manga_dirs:
-    dir_name = "Manga109/images/"+manga_dir+"/"
-    images = os.listdir(dir_name)
-    images.sort()
-    print(dir_name)
-    for image in images:
-        original_image_path = dir_name + image
-        new_image_path = "YOLO/PyTorch-YOLOv3/data/custom/images/" + manga_dir + "-" + image
-        os.system("cp \"%s\" \"%s\""%(original_image_path, new_image_path))
 
+def main(argv=None):
+    args = build_parser().parse_args(argv)
+    copied = copy_images(args.dataset_root, args.output_images_dir)
+    print(f"Copied {copied} images into {args.output_images_dir.resolve()}")
+
+
+if __name__ == "__main__":
+    main()
